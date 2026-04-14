@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6/42 Lottery Generator</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        h2 { color: #1a73e8; margin-bottom: 20px; }
+        button { background-color: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #1557b0; }
+        .results { margin-top: 25px; text-align: left; }
+        .suggestion { background: #e8f0fe; padding: 10px; margin: 8px 0; border-radius: 6px; border-left: 5px solid #1a73e8; font-family: monospace; font-size: 1.1em; }
+        .stats { margin-top: 20px; font-size: 0.9em; color: #555; column-count: 3; text-align: left; border-top: 1px solid #ddd; padding-top: 15px; }
+        .highlight { color: #d93025; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>6/42 Lottery Suggestions</h2>
+    <button onclick="generateLottery()">Generate 4 Suggestions</button>
+    
+    <div id="output" class="results"></div>
+    <div id="stats" class="stats"></div>
+</div>
+
+<script>
+    function generateLottery() {
+        const totalNumbers = 42;
+        const pickCount = 6;
+        const suggestionsCount = 4;
+        
+        let allPicked = [];
+        let htmlOutput = "";
+
+        for (let i = 1; i <= suggestionsCount; i++) {
+            let pool = Array.from({length: totalNumbers}, (_, i) => i + 1);
+            let selection = [];
+
+            // Equivalent to random.sample: pick unique numbers
+            for (let j = 0; j < pickCount; j++) {
+                const randomIndex = Math.floor(Math.random() * pool.length);
+                const pickedNumber = pool.splice(randomIndex, 1)[0];
+                selection.push(pickedNumber);
+                allPicked.push(pickedNumber);
+            }
+
+            // Sort numerically
+            selection.sort((a, b) => a - b);
+            htmlOutput += `<div class="suggestion"><strong>#${i}:</strong> ${selection.join(", ")}</div>`;
+        }
+
+        // Display Suggestions
+        document.getElementById('output').innerHTML = htmlOutput;
+
+        // Calculate Frequencies (The "Repeated" part)
+        const counts = {};
+        allPicked.forEach(num => { counts[num] = (counts[num] || 0) + 1; });
+
+        // Display Frequencies
+        let statsHtml = "<strong>Frequency:</strong><br>";
+        Object.keys(counts).sort((a, b) => a - b).forEach(num => {
+            const repeatText = counts[num] > 1 ? `<span class="highlight">(${counts[num]}x)</span>` : `(${counts[num]}x)`;
+            statsHtml += `Num ${num}: ${repeatText}<br>`;
+        });
+        document.getElementById('stats').innerHTML = statsHtml;
+    }
+</script>
+
+</body>
+</html>
